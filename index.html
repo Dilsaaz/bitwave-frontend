@@ -395,3 +395,23 @@
             <div class="left-stat-label">Payout</div>
             <div class="left-stat-value">Instant</div>
             <div style="font-size: 11px; color: #dbeafe; margin
+fetch(`/api/me?phone=${loggedInPhone}`)
+  .then(r => r.json())
+  .then(data => {
+    const myCode = data.referralCode;
+    const myLink = `https://bitwave-frontend.onrender.com/?ref=${myCode}`;
+
+    document.getElementById("ref-code").innerText = myCode;
+    document.getElementById("ref-link").value = myLink; // input me for copy
+  });<p>Referral Code: <span id="ref-code"></span></p>
+<input id="ref-link" readonly>
+<button onclick="copyRef()">Copy Link</button>
+
+<script>
+  function copyRef() {
+    const inp = document.getElementById("ref-link");
+    inp.select();
+    document.execCommand("copy");
+    alert("Referral link copied!");
+  }
+</script>
