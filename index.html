@@ -418,3 +418,43 @@ fetch(`/api/me?phone=${loggedInPhone}`)
 <input id="refInput" type="text" placeholder="Your referral code" />
 
 <button id="copyBtn">Copy Link</button>
+<script>
+  const baseUrl = "https://bitwave-frontend.onrender.com";
+
+  const refInput = document.getElementById("refInput");
+  const copyBtn = document.getElementById("copyBtn");
+
+  // 1) Copy Link button: apne referral code se full link banega
+  if (copyBtn && refInput) {
+    copyBtn.addEventListener("click", () => {
+      const code = refInput.value.trim();
+      if (!code) {
+        alert("Pehle referral code daalo.");
+        return;
+      }
+
+      const fullLink = `${baseUrl}?ref=${encodeURIComponent(code)}`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(fullLink)
+          .then(() => {
+            alert("Referral link copy ho gaya:\n" + fullLink);
+          })
+          .catch(() => {
+            alert("Copy nahi ho paya, yeh link manual copy kar lo:\n" + fullLink);
+          });
+      } else {
+        // old browser fallback
+        alert("Yeh link manual copy karo:\n" + fullLink);
+      }
+    });
+  }
+
+  // 2) Agar koi banda ?ref=CODE se aaye to box me wahi code dikhe (read only)
+  const params = new URLSearchParams(window.location.search);
+  const refFromUrl = params.get("ref");
+  if (refFromUrl && refInput) {
+    refInput.value = refFromUrl;
+    refInput.readOnly = true;
+  }
+</script>
