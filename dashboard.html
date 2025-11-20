@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BitWave — Dashboard</title>
+<style>
+ body{font-family:Arial,system-ui;background:linear-gradient(180deg,#e6f0ff,#dfeeff);padding:20px}
+ .wrap{max-width:900px;margin:20px auto;background:#fff;padding:18px;border-radius:12px}
+ .card{padding:14px;border-radius:10px;margin-bottom:12px;background:#f8fbff}
+ .row{display:flex;gap:12px;flex-wrap:wrap}
+ .badge{background:#2563eb;color:#fff;padding:6px 10px;border-radius:8px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2>My Dashboard</h2>
+      <div>
+        <button id="logout">Logout</button>
+      </div>
+    </div>
+
+    <div id="info" class="card">
+      Loading...
+    </div>
+
+    <div class="card">
+      <h3>Team</h3>
+      <ul id="teamList"></ul>
+      <input id="teamPhone" placeholder="+91..." />
+      <button id="addTeam">Add team member</button>
+    </div>
+  </div>
+
+<script>
+const API = 'https://YOUR_BACKEND_URL/api'; // update
+const token = localStorage.getItem('bw_token');
+if(!token) { window.location = 'index.html'; }
+
+async function load(){
+  const res = await fetch(API + '/me', {
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  if(!res.ok){
+    localStorage.removeItem('bw_token');
+    alert('Session expired');
+    window.location='index.html';
+    return;
+  }
+  const user = await res.json();
+  document.getElementById('info').innerHTML = `
+    <div><strong>Phone:</strong> ${user.phone}</div>
+    <div><strong>Wallet:</strong> $${user.wallet}</div>
+    <div><strong>Rewards:</strong> $${user.rewards}</div>
+  `;
+  const teamUl = document.getElementById('teamList');
+  teamUl.innerHTML = '';
+  (user.team||[]).forEach(m => {
+    const li = document.createElement('li');
+    li.innerText = (m.name && m.name.length? m.name + ' ':'') + m.phone;
+    teamUl.appendChild(li);
+  });
+}
+load();
+
+document.getElementById('logout').onclick = ()=> {
+  localStorage.removeItem('bw_token');
+  window.location='index.html';
+};
+
+document.getElementById('addTeam').onclick = async ()=>{
+  const phone = document.getElementById('teamPhone').value.trim();
+  if(!phone) return alert('enter phone');
+  const res = await fetch(API + '/team/add', {
+    method:'POST',
+    headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ teamPhone: phone })
+  });
+  if(res.ok){ alert('added'); load(); } else { const d=await res.json(); alert(d.error||'err'); }
+};
+</script>
+</body>
+</html>
