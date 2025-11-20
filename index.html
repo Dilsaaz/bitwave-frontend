@@ -1,461 +1,69 @@
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCodeFromUrl = urlParams.get("ref") || "";
-</script><!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>BitWave Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --primary: #1b73f2;
-      --primary-dark: #1457b8;
-      --bg: #f3f7ff;
-      --card-bg: #ffffff;
-      --text: #1f2933;
-      --muted: #6b7280;
-      --danger: #e11d48;
-      --success: #16a34a;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-    }
-
-    body {
-      background: radial-gradient(circle at top, #e1ecff, #f3f7ff 40%, #eef2ff);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 1100px;
-      margin: 16px;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
-      border-radius: 22px;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
-    }
-
-    @media (max-width: 800px) {
-      .app-container {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Left side (Brand) */
-    .left-pane {
-      background: linear-gradient(145deg, #1b73f2, #63b3ff);
-      color: #e5f1ff;
-      padding: 32px 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .logo {
-      font-weight: 800;
-      font-size: 26px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-badge {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 18px;
-    }
-
-    .left-main-text {
-      margin-top: 36px;
-    }
-
-    .left-main-text h1 {
-      font-size: 28px;
-      line-height: 1.2;
-      margin-bottom: 12px;
-    }
-
-    .left-main-text p {
-      font-size: 14px;
-      max-width: 260px;
-      color: rgba(226, 239, 255, 0.9);
-    }
-
-    .left-stats {
-      margin-top: 40px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .left-stat-card {
-      background: rgba(15, 23, 42, 0.17);
-      border-radius: 14px;
-      padding: 12px 12px;
-      font-size: 12px;
-    }
-
-    .left-stat-label {
-      color: #c8ddff;
-      margin-bottom: 4px;
-    }
-
-    .left-stat-value {
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .left-footer {
-      margin-top: 40px;
-      font-size: 12px;
-      color: #c8ddff;
-    }
-
-    /* Right side (Auth + Dashboard) */
-    .right-pane {
-      padding: 26px 26px 26px 24px;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .top-tabs {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-bottom: 22px;
-      font-size: 14px;
-    }
-
-    .tab-btn {
-      border: none;
-      background: transparent;
-      padding: 6px 12px;
-      border-radius: 999px;
-      cursor: pointer;
-      color: var(--muted);
-    }
-
-    .tab-btn.active {
-      background: #ffffff;
-      color: var(--primary-dark);
-      font-weight: 600;
-      box-shadow: 0 8px 18px rgba(148, 163, 184, 0.35);
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 22px 20px;
-      box-shadow: 0 12px 24px rgba(148, 163, 184, 0.24);
-    }
-
-    .card h2 {
-      font-size: 20px;
-      margin-bottom: 6px;
-    }
-
-    .card-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      margin-bottom: 4px;
-      color: #4b5563;
-    }
-
-    input {
-      width: 100%;
-      padding: 9px 11px;
-      border-radius: 12px;
-      border: 1px solid #d1d5db;
-      font-size: 14px;
-      outline: none;
-      background: #f9fafb;
-    }
-
-    input:focus {
-      border-color: var(--primary);
-      background: #ffffff;
-      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: none;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #ffffff;
-      box-shadow: 0 12px 22px rgba(37, 99, 235, 0.55);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #d1d5db;
-      color: #4b5563;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .row > div {
-      flex: 1;
-    }
-
-    .small {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .error-msg {
-      margin-top: 8px;
-      font-size: 13px;
-      color: var(--danger);
-      min-height: 18px;
-    }
-
-    .success-msg {
-      margin-top: 8px;
-      font-size: 13px;
-      color: var(--success);
-      min-height: 18px;
-    }
-
-    /* Dashboard */
-    .hidden {
-      display: none !important;
-    }
-
-    .dash-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .dash-title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .dash-pill {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .tag-pill {
-      background: #e5f0ff;
-      color: var(--primary-dark);
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .dash-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .stat-card {
-      border-radius: 16px;
-      background: linear-gradient(135deg, #ffffff, #eef4ff);
-      padding: 12px 12px;
-      border: 1px solid #e5e7eb;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .stat-sub {
-      font-size: 11px;
-      color: #6b7280;
-    }
-
-    .section-title {
-      margin-top: 10px;
-      margin-bottom: 8px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    table {
-      width: 100%;
-      border-spacing: 0;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    th,
-    td {
-      padding: 7px 6px;
-      text-align: left;
-    }
-
-    th {
-      font-weight: 600;
-      color: #6b7280;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    tr:nth-child(even) td {
-      background: #f9fafb;
-    }
-
-    .level-pill {
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      background: #e0f2fe;
-      color: #0369a1;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BitWave — Login</title>
+<style>
+  body{font-family:Arial,system-ui;background:#f0f4ff;padding:20px}
+  .card{max-width:420px;margin:40px auto;padding:20px;border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+  input,button{width:100%;padding:12px;margin-top:8px;border-radius:8px;border:1px solid #ddd}
+  button{background:#2563eb;color:#fff;border:none}
+</style>
 </head>
 <body>
-  <div class="app-container">
-    <!-- Left branding pane -->
-    <div class="left-pane">
-      <div>
-        <div class="logo">
-          <div class="logo-badge">B</div>
-          <span>BitWave</span>
-        </div>
+  <div class="card">
+    <h2>Welcome to BitWave</h2>
+    <p>Login with your mobile number. Use international format: +91xxxxxxxxxx</p>
 
-        <div class="left-main-text">
-          <h1>Daily income, level rewards.<br />All in one dashboard.</h1>
-          <p>
-            Track your BitWave daily profit and level earnings in a clean
-            fintech style dashboard.
-          </p>
-        </div>
+    <label>Mobile</label>
+    <input id="phone" placeholder="+91..." />
 
-        <div class="left-stats">
-          <div class="left-stat-card">
-            <div class="left-stat-label">Min. Start</div>
-            <div class="left-stat-value">$10</div>
-            <div style="font-size: 11px; color: #dbeafe; margin-top: 4px">
-              Instant reward credit
-            </div>
-          </div>
-          <div class="left-stat-card">
-            <div class="left-stat-label">Payout</div>
-            <div class="left-stat-value">Instant</div>
-            <div style="font-size: 11px; color: #dbeafe; margin
-fetch(`/api/me?phone=${loggedInPhone}`)
-  .then(r => r.json())
-  .then(data => {
-    const myCode = data.referralCode;
-    const myLink = `https://bitwave-frontend.onrender.com/?ref=${myCode}`;
+    <button id="sendOtp">Send OTP</button>
 
-    document.getElementById("ref-code").innerText = myCode;
-    document.getElementById("ref-link").value = myLink; // input me for copy
-  });<p>Referral Code: <span id="ref-code"></span></p>
-<input id="ref-link" readonly>
-<button onclick="copyRef()">Copy Link</button>
+    <div id="verifyBox" style="display:none;">
+      <label>Enter OTP</label>
+      <input id="code" placeholder="123456" />
+      <button id="verifyOtp">Verify & Login</button>
+    </div>
+
+    <div id="message" style="color:green;margin-top:10px"></div>
+  </div>
 
 <script>
-  function copyRef() {
-    const inp = document.getElementById("ref-link");
-    inp.select();
-    document.execCommand("copy");
-    alert("Referral link copied!");
+const API = 'https://YOUR_BACKEND_URL/api'; // <- update this to your Render URL or localhost
+document.getElementById('sendOtp').onclick = async () => {
+  const phone = document.getElementById('phone').value.trim();
+  if(!phone){ alert('enter phone'); return; }
+  const res = await fetch(API + '/send-otp', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ phone })
+  });
+  const data = await res.json();
+  if(res.ok) {
+    document.getElementById('verifyBox').style.display = 'block';
+    document.getElementById('message').innerText = 'OTP sent';
+  } else {
+    document.getElementById('message').innerText = data.error || JSON.stringify(data);
   }
+};
+
+document.getElementById('verifyOtp').onclick = async () => {
+  const phone = document.getElementById('phone').value.trim();
+  const code = document.getElementById('code').value.trim();
+  if(!code){ alert('enter code'); return; }
+  const res = await fetch(API + '/verify-otp', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ phone, code })
+  });
+  const data = await res.json();
+  if(res.ok) {
+    localStorage.setItem('bw_token', data.token);
+    window.location = 'dashboard.html';
+  } else {
+    alert(data.error || 'Verification failed');
+  }
+};
 </script>
-<input id="refInput" type="text" placeholder="Your referral code" />
-
-<button id="copyBtn">Copy Link</button>
-<script>
-  const baseUrl = "https://bitwave-frontend.onrender.com";
-
-  const refInput = document.getElementById("refInput");
-  const copyBtn = document.getElementById("copyBtn");
-
-  // 1) Copy Link button: apne referral code se full link banega
-  if (copyBtn && refInput) {
-    copyBtn.addEventListener("click", () => {
-      const code = refInput.value.trim();
-      if (!code) {
-        alert("Pehle referral code daalo.");
-        return;
-      }
-
-      const fullLink = `${baseUrl}?ref=${encodeURIComponent(code)}`;
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(fullLink)
-          .then(() => {
-            alert("Referral link copy ho gaya:\n" + fullLink);
-          })
-          .catch(() => {
-            alert("Copy nahi ho paya, yeh link manual copy kar lo:\n" + fullLink);
-          });
-      } else {
-        // old browser fallback
-        alert("Yeh link manual copy karo:\n" + fullLink);
-      }
-    });
-  }
-
-  // 2) Agar koi banda ?ref=CODE se aaye to box me wahi code dikhe (read only)
-  const params = new URLSearchParams(window.location.search);
-  const refFromUrl = params.get("ref");
-  if (refFromUrl && refInput) {
-    refInput.value = refFromUrl;
-    refInput.readOnly = true;
-  }
-</script>
-https://bitwave-frontend.onrender.com
+</body>
+</html>
